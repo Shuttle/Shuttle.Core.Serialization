@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shuttle.Core.Serialization", "Shuttle.Core.Serialization\Shuttle.Core.Serialization.csproj", "{6CF30910-1F39-4BE4-9342-A05309E234A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shuttle.Core.Serialization.Tests", "Shuttle.Core.Serialization.Tests\Shuttle.Core.Serialization.Tests.csproj", "{E442C6A4-6D9C-4963-ACB6-0B2B3C0125C9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D29EF3B5-289A-4DC7-95D7-DF3515795668}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6CF30910-1F39-4BE4-9342-A05309E234A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CF30910-1F39-4BE4-9342-A05309E234A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CF30910-1F39-4BE4-9342-A05309E234A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CF30910-1F39-4BE4-9342-A05309E234A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E442C6A4-6D9C-4963-ACB6-0B2B3C0125C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E442C6A4-6D9C-4963-ACB6-0B2B3C0125C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E442C6A4-6D9C-4963-ACB6-0B2B3C0125C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E442C6A4-6D9C-4963-ACB6-0B2B3C0125C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F5214FBA-E010-4E46-9934-AC10701DF0E0}
+	EndGlobalSection
+EndGlobal
