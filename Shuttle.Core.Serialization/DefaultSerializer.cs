@@ -97,12 +97,11 @@ namespace Shuttle.Core.Serialization
                     return;
                 }
 
-                if (!_overrides.ContainsKey(root))
+                if (!_overrides.TryGetValue(root, out var overrides))
                 {
-                    _overrides.Add(root, new XmlAttributeOverrides());
+                    overrides = new XmlAttributeOverrides();
+                    _overrides.Add(root, overrides);
                 }
-
-                var overrides = _overrides[root];
 
                 overrides.Add(contained,
                     new XmlAttributes {XmlRoot = new XmlRootAttribute {Namespace = contained.Namespace}});
@@ -123,7 +122,12 @@ namespace Shuttle.Core.Serialization
         {
             lock (Padlock)
             {
-                return _overrides.ContainsKey(root) && _overrides[root][contained] != null;
+                if (!_overrides.TryGetValue(root, out var overrides))
+                {
+                    return false;
+                }
+
+                return overrides[contained] != null;
             }
         }
 
@@ -131,17 +135,19 @@ namespace Shuttle.Core.Serialization
         {
             lock (Padlock)
             {
-                if (!_overrides.ContainsKey(type))
+                if (!_overrides.TryGetValue(type, out var overrides))
                 {
-                    _overrides.Add(type, new XmlAttributeOverrides());
+                    overrides = new XmlAttributeOverrides();
+                    _overrides.Add(type, overrides);
                 }
 
-                if (!_serializers.ContainsKey(type))
+                if (!_serializers.TryGetValue(type, out var serializer))
                 {
-                    _serializers.Add(type, new XmlSerializer(type, _overrides[type]));
+                    serializer = new XmlSerializer(type, overrides);
+                    _serializers.Add(type, serializer);
                 }
 
-                return _serializers[type];
+                return serializer;
             }
         }
     }
