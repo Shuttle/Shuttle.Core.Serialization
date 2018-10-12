@@ -49,7 +49,8 @@ namespace Shuttle.Core.Serialization
                 writer.Flush();
             }
 
-            return new MemoryStream(Encoding.UTF8.GetBytes(xml.ToString()));
+            var data = Encoding.UTF8.GetBytes(xml.ToString());
+            return new MemoryStream(data, 0, data.Length, false, true);
         }
 
         public object Deserialize(Type type, Stream stream)
