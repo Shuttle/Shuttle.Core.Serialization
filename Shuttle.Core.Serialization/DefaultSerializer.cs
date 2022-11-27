@@ -19,15 +19,23 @@ namespace Shuttle.Core.Serialization
 
         private readonly Dictionary<Type, XmlSerializer> _serializers = new Dictionary<Type, XmlSerializer>();
 
-        private readonly XmlWriterSettings _xmlSettings;
+        private readonly XmlWriterSettings _xmlWriterSettings;
+        private readonly XmlDictionaryReaderQuotas _xmlDictionaryReaderQuotas;
 
         public DefaultSerializer()
         {
-            _xmlSettings = new XmlWriterSettings
+            _xmlWriterSettings = new XmlWriterSettings
             {
                 Encoding = Encoding.UTF8,
                 OmitXmlDeclaration = true,
                 Indent = true
+            };
+
+            _xmlDictionaryReaderQuotas = new XmlDictionaryReaderQuotas
+            {
+                MaxArrayLength = int.MaxValue,
+                MaxStringContentLength = int.MaxValue,
+                MaxNameTableCharCount = int.MaxValue
             };
 
             _namespaces.Add(string.Empty, string.Empty);
@@ -42,7 +50,7 @@ namespace Shuttle.Core.Serialization
 
             var xml = new StringBuilder();
 
-            using (var writer = XmlWriter.Create(xml, _xmlSettings))
+            using (var writer = XmlWriter.Create(xml, _xmlWriterSettings))
             {
                 serializer.Serialize(writer, instance, _namespaces);
 
@@ -68,13 +76,8 @@ namespace Shuttle.Core.Serialization
                 stream.Position = position;
                 copy.Position = 0;
 
-                using (var reader = XmlDictionaryReader.CreateTextReader(copy, Encoding.UTF8,
-                    new XmlDictionaryReaderQuotas
-                    {
-                        MaxArrayLength = int.MaxValue,
-                        MaxStringContentLength = int.MaxValue,
-                        MaxNameTableCharCount = int.MaxValue
-                    }, null))
+                
+                using (var reader = XmlDictionaryReader.CreateTextReader(copy, Encoding.UTF8, _xmlDictionaryReaderQuotas, null))
                 {
                     return GetSerializer(type).Deserialize(reader);
                 }
