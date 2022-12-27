@@ -41,6 +41,9 @@ namespace Shuttle.Core.Serialization
             _namespaces.Add(string.Empty, string.Empty);
         }
 
+        public string Name => "Xml";
+        public byte Id => 1;
+
         public Stream Serialize(object instance)
         {
             Guard.AgainstNull(instance, nameof(instance));
