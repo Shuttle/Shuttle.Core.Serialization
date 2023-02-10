@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Shuttle.Core.Contract;
@@ -26,6 +27,7 @@ namespace Shuttle.Core.Serialization
         {
             _xmlWriterSettings = new XmlWriterSettings
             {
+                Async = true,
                 Encoding = Encoding.UTF8,
                 OmitXmlDeclaration = true,
                 Indent = true
@@ -42,9 +44,8 @@ namespace Shuttle.Core.Serialization
         }
 
         public string Name => "Xml";
-        public byte Id => 1;
 
-        public Stream Serialize(object instance)
+        public async Task<Stream> Serialize(object instance)
         {
             Guard.AgainstNull(instance, nameof(instance));
 
@@ -57,14 +58,15 @@ namespace Shuttle.Core.Serialization
             {
                 serializer.Serialize(writer, instance, _namespaces);
 
-                writer.Flush();
+                await writer.FlushAsync().ConfigureAwait(false);
             }
 
             var data = Encoding.UTF8.GetBytes(xml.ToString());
+            
             return new MemoryStream(data, 0, data.Length, false, true);
         }
 
-        public object Deserialize(Type type, Stream stream)
+        public async Task<object> Deserialize(Type type, Stream stream)
         {
             Guard.AgainstNull(type, nameof(type));
             Guard.AgainstNull(stream, nameof(stream));
@@ -74,11 +76,11 @@ namespace Shuttle.Core.Serialization
                 var position = stream.Position;
 
                 stream.Position = 0;
-                stream.CopyTo(copy);
+
+                await stream.CopyToAsync(copy).ConfigureAwait(false);
 
                 stream.Position = position;
                 copy.Position = 0;
-
                 
                 using (var reader = XmlDictionaryReader.CreateTextReader(copy, Encoding.UTF8, _xmlDictionaryReaderQuotas, null))
                 {
