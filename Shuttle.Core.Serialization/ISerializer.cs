@@ -7,7 +7,9 @@ namespace Shuttle.Core.Serialization
     public interface ISerializer
     {
         string Name { get; }
-        Task<Stream> Serialize(object instance);
-        Task<object> Deserialize(Type type, Stream stream);
+        Stream Serialize(object instance);
+        object Deserialize(Type type, Stream stream);
+        Task<Stream> SerializeAsync(object instance);
+        Task<object> DeserializeAsync(Type type, Stream stream);
     }
 }
