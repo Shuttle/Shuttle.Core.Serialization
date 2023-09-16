@@ -47,25 +47,15 @@ namespace Shuttle.Core.Serialization
 
         public Stream Serialize(object instance)
         {
-            Guard.AgainstNull(instance, nameof(instance));
-
-            var messageType = instance.GetType();
-            var serializer = GetSerializer(messageType);
-
-            var xml = new StringBuilder();
-
-            using var writer = XmlWriter.Create(xml, _xmlWriterSettings);
-            
-            serializer.Serialize(writer, instance, _namespaces);
-
-            writer.Flush();
-
-            var data = Encoding.UTF8.GetBytes(xml.ToString());
-
-            return new MemoryStream(data, 0, data.Length, false, true);
+            return SerializeAsync(instance, true).GetAwaiter().GetResult();
         }
 
         public async Task<Stream> SerializeAsync(object instance)
+        {
+            return await SerializeAsync(instance, false).ConfigureAwait(false);
+        }
+
+        private async Task<Stream> SerializeAsync(object instance, bool sync)
         {
             Guard.AgainstNull(instance, nameof(instance));
 
@@ -78,7 +68,14 @@ namespace Shuttle.Core.Serialization
             
             serializer.Serialize(writer, instance, _namespaces);
 
-            await writer.FlushAsync().ConfigureAwait(false);
+            if (sync)
+            {
+                writer.Flush();
+            }
+            else
+            {
+                await writer.FlushAsync().ConfigureAwait(false);
+            }
 
             var data = Encoding.UTF8.GetBytes(xml.ToString());
             
@@ -87,25 +84,15 @@ namespace Shuttle.Core.Serialization
 
         public object Deserialize(Type type, Stream stream)
         {
-            Guard.AgainstNull(type, nameof(type));
-            Guard.AgainstNull(stream, nameof(stream));
-
-            using var copy = new MemoryStream();
-
-            var position = stream.Position;
-
-            stream.Position = 0;
-            stream.CopyTo(copy);
-
-            stream.Position = position;
-            copy.Position = 0;
-
-            using var reader = XmlDictionaryReader.CreateTextReader(copy, Encoding.UTF8, _xmlDictionaryReaderQuotas, null);
-
-            return GetSerializer(type).Deserialize(reader);
+            return DeserializeAsync(type, stream, true).GetAwaiter().GetResult();
         }
 
         public async Task<object> DeserializeAsync(Type type, Stream stream)
+        {
+            return await DeserializeAsync(type, stream, false).ConfigureAwait(false);
+        }
+
+        private async Task<object> DeserializeAsync(Type type, Stream stream, bool sync)
         {
             Guard.AgainstNull(type, nameof(type));
             Guard.AgainstNull(stream, nameof(stream));
@@ -115,7 +102,14 @@ namespace Shuttle.Core.Serialization
 
             stream.Position = 0;
 
-            await stream.CopyToAsync(copy).ConfigureAwait(false);
+            if (sync)
+            {
+                stream.CopyTo(copy);
+            }
+            else
+            {
+                await stream.CopyToAsync(copy).ConfigureAwait(false);
+            }
 
             stream.Position = position;
             copy.Position = 0;
