@@ -14,6 +14,7 @@ The `DefaultSerializer` makes use of the standard .NET xml serialization functio
 
 ``` c#
 Stream Serialize(object message);
+Task<Stream> SerializeAsync(object message);
 ```
 
 Returns the message `object` as a `Stream`.
@@ -22,9 +23,10 @@ Returns the message `object` as a `Stream`.
 
 ``` c#
 object Deserialize(Type type, Stream stream);
+Task<object> DeserializeAsync(Type type, Stream stream);
 ```
 
-Deserializes the `Stream` into an `obejct` of the given type.
+Deserializes the `Stream` into an `object` of the given type.
 
 # ISerializerRootType
 
