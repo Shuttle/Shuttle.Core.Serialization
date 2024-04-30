@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 using Shuttle.Core.Contract;
@@ -26,6 +27,7 @@ namespace Shuttle.Core.Serialization
         {
             _xmlWriterSettings = new XmlWriterSettings
             {
+                Async = true,
                 Encoding = Encoding.UTF8,
                 OmitXmlDeclaration = true,
                 Indent = true
@@ -42,9 +44,18 @@ namespace Shuttle.Core.Serialization
         }
 
         public string Name => "Xml";
-        public byte Id => 1;
 
         public Stream Serialize(object instance)
+        {
+            return SerializeAsync(instance, true).GetAwaiter().GetResult();
+        }
+
+        public async Task<Stream> SerializeAsync(object instance)
+        {
+            return await SerializeAsync(instance, false).ConfigureAwait(false);
+        }
+
+        private async Task<Stream> SerializeAsync(object instance, bool sync)
         {
             Guard.AgainstNull(instance, nameof(instance));
 
@@ -53,38 +64,59 @@ namespace Shuttle.Core.Serialization
 
             var xml = new StringBuilder();
 
-            using (var writer = XmlWriter.Create(xml, _xmlWriterSettings))
-            {
-                serializer.Serialize(writer, instance, _namespaces);
+            using var writer = XmlWriter.Create(xml, _xmlWriterSettings);
+            
+            serializer.Serialize(writer, instance, _namespaces);
 
+            if (sync)
+            {
                 writer.Flush();
+            }
+            else
+            {
+                await writer.FlushAsync().ConfigureAwait(false);
             }
 
             var data = Encoding.UTF8.GetBytes(xml.ToString());
+            
             return new MemoryStream(data, 0, data.Length, false, true);
         }
 
         public object Deserialize(Type type, Stream stream)
         {
+            return DeserializeAsync(type, stream, true).GetAwaiter().GetResult();
+        }
+
+        public async Task<object> DeserializeAsync(Type type, Stream stream)
+        {
+            return await DeserializeAsync(type, stream, false).ConfigureAwait(false);
+        }
+
+        private async Task<object> DeserializeAsync(Type type, Stream stream, bool sync)
+        {
             Guard.AgainstNull(type, nameof(type));
             Guard.AgainstNull(stream, nameof(stream));
 
-            using (var copy = new MemoryStream())
+            using var copy = new MemoryStream();
+            var position = stream.Position;
+
+            stream.Position = 0;
+
+            if (sync)
             {
-                var position = stream.Position;
-
-                stream.Position = 0;
                 stream.CopyTo(copy);
-
-                stream.Position = position;
-                copy.Position = 0;
-
-                
-                using (var reader = XmlDictionaryReader.CreateTextReader(copy, Encoding.UTF8, _xmlDictionaryReaderQuotas, null))
-                {
-                    return GetSerializer(type).Deserialize(reader);
-                }
             }
+            else
+            {
+                await stream.CopyToAsync(copy).ConfigureAwait(false);
+            }
+
+            stream.Position = position;
+            copy.Position = 0;
+
+            using var reader = XmlDictionaryReader.CreateTextReader(copy, Encoding.UTF8, _xmlDictionaryReaderQuotas, null);
+
+            return GetSerializer(type).Deserialize(reader);
         }
 
         public void AddSerializerType(Type root, Type contained)
