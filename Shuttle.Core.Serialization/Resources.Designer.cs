@@ -61,6 +61,15 @@ namespace Shuttle.Core.Serialization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not deserialize object of type &apos;{0}&apos;..
+        /// </summary>
+        internal static string DeserializationException {
+            get {
+                return ResourceManager.GetString("DeserializationException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A serializer with name &apos;{0}&apos; has already been registered..
         /// </summary>
         internal static string DuplicateSerializerException {

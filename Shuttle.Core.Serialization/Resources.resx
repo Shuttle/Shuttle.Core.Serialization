@@ -125,4 +125,8 @@
     <value>Could not find a serializer with name '{0}'.</value>
     <comment>0 = name</comment>
   </data>
+  <data name="DeserializationException" xml:space="preserve">
+    <value>Could not deserialize object of type '{0}'.</value>
+    <comment>0 = type name</comment>
+  </data>
 </root>
