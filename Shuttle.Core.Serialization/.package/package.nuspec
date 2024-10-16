@@ -17,6 +17,9 @@
 		<tags>shuttle serialization</tags>
 		<dependencies>
       <dependency id="Shuttle.Core.Contract" version="20.0.0" />
+      <dependency id="Microsoft.Extensions.DependencyInjection" version="8.0.1" />
+      <dependency id="Microsoft.Extensions.Options" version="8.0.2" />
+      <dependency id="System.Text.Json" version="8.0.5" />
 		</dependencies>
 	</metadata>
 	<files>

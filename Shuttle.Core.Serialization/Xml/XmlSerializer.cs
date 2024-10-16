@@ -7,37 +7,52 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.Extensions.Options;
 using Shuttle.Core.Contract;
 
 namespace Shuttle.Core.Serialization;
 
-public class DefaultSerializer : ISerializer, ISerializerRootType
+public class XmlSerializer : ISerializer, ISerializerRootType
 {
-    private static readonly object Padlock = new();
+    private static readonly object Lock = new();
     private readonly XmlSerializerNamespaces _namespaces = new();
 
     private readonly Dictionary<Type, XmlAttributeOverrides> _overrides = new();
 
-    private readonly Dictionary<Type, XmlSerializer> _serializers = new();
+    private readonly Dictionary<Type, System.Xml.Serialization.XmlSerializer> _serializers = new();
     private readonly XmlDictionaryReaderQuotas _xmlDictionaryReaderQuotas;
 
     private readonly XmlWriterSettings _xmlWriterSettings;
 
-    public DefaultSerializer()
+    public XmlSerializer(IOptions<XmlSerializerOptions> xmlSerializerOptions)
     {
+        var options = Guard.AgainstNull(Guard.AgainstNull(xmlSerializerOptions).Value);
+
         _xmlWriterSettings = new()
         {
             Async = true,
-            Encoding = Encoding.UTF8,
-            OmitXmlDeclaration = true,
-            Indent = true
+            Encoding = options.Encoding,
+            OmitXmlDeclaration = options.OmitXmlDeclaration,
+            Indent = options.Indent,
+            IndentChars = options.IndentChars,
+            NewLineChars = options.NewLineChars,
+            NewLineOnAttributes = options.NewLineOnAttributes,
+            NewLineHandling = options.NewLineHandling,
+            CheckCharacters = options.CheckCharacters,
+            ConformanceLevel = options.ConformanceLevel,
+            CloseOutput = options.CloseOutput,
+            NamespaceHandling = options.NamespaceHandling,
+            DoNotEscapeUriAttributes = options.DoNotEscapeUriAttributes,
+            WriteEndDocumentOnClose = options.WriteEndDocumentOnClose
         };
 
         _xmlDictionaryReaderQuotas = new()
         {
-            MaxArrayLength = int.MaxValue,
-            MaxStringContentLength = int.MaxValue,
-            MaxNameTableCharCount = int.MaxValue
+            MaxArrayLength = options.MaxArrayLength,
+            MaxStringContentLength = options.MaxStringContentLength,
+            MaxNameTableCharCount = options.MaxNameTableCharCount,
+            MaxBytesPerRead = options.MaxBytesPerRead,
+            MaxDepth = options.MaxDepth
         };
 
         _namespaces.Add(string.Empty, string.Empty);
@@ -95,7 +110,7 @@ public class DefaultSerializer : ISerializer, ISerializerRootType
             return;
         }
 
-        lock (Padlock)
+        lock (Lock)
         {
             if (HasSerializerType(root, contained))
             {
@@ -122,9 +137,9 @@ public class DefaultSerializer : ISerializer, ISerializerRootType
         }
     }
 
-    private XmlSerializer GetSerializer(Type type)
+    private System.Xml.Serialization.XmlSerializer GetSerializer(Type type)
     {
-        lock (Padlock)
+        lock (Lock)
         {
             if (!_overrides.TryGetValue(type, out var overrides))
             {
@@ -144,7 +159,7 @@ public class DefaultSerializer : ISerializer, ISerializerRootType
 
     private bool HasSerializerType(Type root, Type contained)
     {
-        lock (Padlock)
+        lock (Lock)
         {
             if (!_overrides.TryGetValue(root, out var overrides))
             {

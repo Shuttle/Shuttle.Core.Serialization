@@ -1,17 +1,18 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 
 namespace Shuttle.Core.Serialization.Tests
 {
-    public class DefaultSerializerFixture
+    public class XmlSerializerFixture
     {
         [Test]
         public async Task Should_be_able_to_serialize_and_deserialize_a_simple_type_async()
         {
             var original = new SimpleSerializerType();
-            var serializer = new DefaultSerializer();
+            var serializer = new XmlSerializer(Options.Create(new XmlSerializerOptions()));
 
             var stream = await serializer.SerializeAsync(original);
 
@@ -28,7 +29,7 @@ namespace Shuttle.Core.Serialization.Tests
         public async Task Should_be_able_to_serialize_and_deserialize_a_complex_type_async()
         {
             var complex = new ComplexSerializerType();
-            var serializer = new DefaultSerializer();
+            var serializer = new XmlSerializer(Options.Create(new XmlSerializerOptions()));
 
             serializer.AddSerializerType(typeof(ComplexSerializerType), typeof(v1.SomeSerializerType));
             serializer.AddSerializerType(typeof(ComplexSerializerType), typeof(v1.AnotherSerializerType));
