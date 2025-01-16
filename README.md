@@ -25,6 +25,8 @@ services.AddXmlSerializer(builder => {
 });
 ```
 
+The `builder.Options` contains properties that map to [XmlWriterSettings](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlwritersettings?view=net-8.0) as well as [XmlDictionaryReaderQuotas](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmldictionaryreaderquotas?view=net-8.0).
+
 ### JsonSerializer
 
 ``` c#
