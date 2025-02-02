@@ -4,16 +4,50 @@
 PM> Install-Package Shuttle.Core.Serialization
 ```
 
-An implementation of the `ISerializer` interface is used to serialize objects into a `Stream`.
+The following implementations of the `ISerializer` interface is used to serialize objects into a `Stream`:
 
-The `DefaultSerializer` makes use of the standard .NET xml serialization functionality.
+- `XmlSerializer` makes use of the standard .NET XML serialization functionality.
+- `JsonSerializer` makes use of the `System.Test.Json` serialization functionality.
+
+## Usage
+
+### XmlSerializer
+
+``` c#
+services.AddXmlSerializer(builder => {
+	builder.Options = new XmlSerializerOptions 
+	{
+	};
+
+	// or
+
+	buidler.Options.option = value;
+});
+```
+
+The `builder.Options` contains properties that map to [XmlWriterSettings](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlwritersettings?view=net-8.0) as well as [XmlDictionaryReaderQuotas](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmldictionaryreaderquotas?view=net-8.0).
+
+### JsonSerializer
+
+``` c#
+services.AddJsonSerializer(builder => {
+	builder.Options = new JsonSerializerOptions 
+	{
+	};
+
+	// or
+
+	buidler.Options.option = value;
+});
+```
+
+The `builder.Options` is of type [JsonSerializerOptions](https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions?view=net-6.0).
 
 ## Methods
 
 ### Serialize
 
 ``` c#
-Stream Serialize(object message);
 Task<Stream> SerializeAsync(object message);
 ```
 
@@ -22,17 +56,16 @@ Returns the message `object` as a `Stream`.
 ### Deserialize
 
 ``` c#
-object Deserialize(Type type, Stream stream);
 Task<object> DeserializeAsync(Type type, Stream stream);
 ```
 
 Deserializes the `Stream` into an `object` of the given type.
 
-# ISerializerRootType
+## ISerializerRootType
 
-The `ISerializerRootType` interface is an optional interface that serializer implementations can use that allows the developer to specify explicit object types contained within a root type.  
+The `XmlSerializer` implements the `ISerializerRootType` interface which is an optional interface that serializer implementations can use that allows the developer to specify explicit object types contained within a root type.  
 
-The `DefaultSerializer` implements this interface and it is recommended that you explicitly register types with the same name, but in different namespaes, that will be serialized within the same root type to avoid any conflicts later down the line.
+It is recommended that you explicitly register types with the same name, but in different namespaes, that will be serialized within the same root type to avoid any conflicts later down the line.
 
 For instance, the following two types will cause issues when used in the root `Complex` type as they both serialize to the same name and the .Net serializer cannot seem to distinguish the difference:
 
@@ -63,12 +96,12 @@ namespace Serializer
 }
 ```
 
-By explicitly specifying the types the `DefaultSerializer` will add a namespace that will cause the types to be correctly identified.
+By explicitly specifying the types the `XmlSerializer` will add a namespace that will cause the types to be correctly identified.
 
-## AddSerializerType
+### AddSerializerType
 
 ``` c#
 void AddSerializerType(Type root, Type contained);
 ```
 
-Specify the `contained` tpe that is used within te `root` type somewhere.
+Specify the `contained` type that is used within the `root` type.

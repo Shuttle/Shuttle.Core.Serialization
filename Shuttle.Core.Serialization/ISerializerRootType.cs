@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace Shuttle.Core.Serialization
+namespace Shuttle.Core.Serialization;
+
+public interface ISerializerRootType
 {
-    public interface ISerializerRootType
-    {
-        void AddSerializerType(Type root, Type contained);
-    }
+    void AddSerializerType(Type root, Type contained);
 }

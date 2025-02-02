@@ -2,14 +2,11 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Shuttle.Core.Serialization
+namespace Shuttle.Core.Serialization;
+
+public interface ISerializer
 {
-    public interface ISerializer
-    {
-        string Name { get; }
-        Stream Serialize(object instance);
-        object Deserialize(Type type, Stream stream);
-        Task<Stream> SerializeAsync(object instance);
-        Task<object> DeserializeAsync(Type type, Stream stream);
-    }
+    string Name { get; }
+    Task<object> DeserializeAsync(Type type, Stream stream);
+    Task<Stream> SerializeAsync(object instance);
 }

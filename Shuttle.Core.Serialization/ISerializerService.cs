@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace Shuttle.Core.Serialization
+namespace Shuttle.Core.Serialization;
+
+public interface ISerializerService
 {
-    public interface ISerializerService
-    {
-        ISerializerService Add(ISerializer serializer);
-        ISerializer Get(string name);
-        bool Contains(string name);
-        IEnumerable<ISerializer> Serializers { get; }
-    }
+    IEnumerable<ISerializer> Serializers { get; }
+    ISerializerService Add(ISerializer serializer);
+    bool Contains(string name);
+    ISerializer Get(string name);
 }
