@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace Shuttle.Core.Serialization.Tests.v1;
 
-namespace Shuttle.Core.Serialization.Tests.v1
+public class AnotherSerializerType
 {
-    public class AnotherSerializerType
-    {
-        public Guid Id { get; set; } = Guid.NewGuid();
-    }
+    public Guid Id { get; set; } = Guid.NewGuid();
 }

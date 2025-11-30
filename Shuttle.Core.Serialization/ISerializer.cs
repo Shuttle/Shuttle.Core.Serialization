@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace Shuttle.Core.Serialization;
+﻿namespace Shuttle.Core.Serialization;
 
 public interface ISerializer
 {

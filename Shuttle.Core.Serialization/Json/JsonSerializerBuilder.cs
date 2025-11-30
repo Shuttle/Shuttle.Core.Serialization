@@ -1,25 +1,16 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Shuttle.Core.Contract;
 
-namespace Shuttle.Core.Serialization
+namespace Shuttle.Core.Serialization;
+
+public class JsonSerializerBuilder(IServiceCollection services)
 {
-    public class JsonSerializerBuilder
+    public JsonSerializerOptions Options
     {
-        public IServiceCollection Services { get; }
+        get;
+        set => field = value ?? throw new ArgumentNullException(nameof(value));
+    } = new();
 
-        public JsonSerializerOptions Options
-        {
-            get => _jsonSerializerOptions;
-            set => _jsonSerializerOptions = value ?? throw new ArgumentNullException(nameof(value));
-        }
-
-        private JsonSerializerOptions _jsonSerializerOptions = new();
-
-        public JsonSerializerBuilder(IServiceCollection services)
-        {
-            Services = Guard.AgainstNull(services);
-        }
-    }
+    public IServiceCollection Services { get; } = Guard.AgainstNull(services);
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Shuttle.Core.Contract;
+﻿using Shuttle.Core.Contract;
 
 namespace Shuttle.Core.Serialization;
 
@@ -12,29 +10,23 @@ public class SerializerService : ISerializerService
     {
         Guard.AgainstNull(serializer);
 
-        if (!_serializers.TryAdd(serializer.Name, serializer))
-        {
-            throw new ArgumentException(string.Format(Resources.DuplicateSerializerException, serializer.Name));
-        }
-
-        return this;
+        return !_serializers.TryAdd(serializer.Name, serializer)
+            ? throw new ArgumentException(string.Format(Resources.DuplicateSerializerException, serializer.Name))
+            : this;
     }
 
     public ISerializer Get(string name)
     {
-        Guard.AgainstNullOrEmptyString(name);
+        Guard.AgainstEmpty(name);
 
-        if (!_serializers.TryGetValue(name, out var serializer))
-        {
-            throw new ArgumentException(string.Format(Resources.SerializerMissingException, name));
-        }
-
-        return serializer;
+        return !_serializers.TryGetValue(name, out var serializer)
+            ? throw new ArgumentException(string.Format(Resources.SerializerMissingException, name))
+            : serializer;
     }
 
     public bool Contains(string name)
     {
-        return _serializers.ContainsKey(Guard.AgainstNullOrEmptyString(name));
+        return _serializers.ContainsKey(Guard.AgainstEmpty(name));
     }
 
     public IEnumerable<ISerializer> Serializers => _serializers.Values;

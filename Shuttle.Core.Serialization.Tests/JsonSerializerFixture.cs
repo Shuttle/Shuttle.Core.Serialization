@@ -1,64 +1,61 @@
-﻿using System;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Shuttle.Core.Serialization.Tests.v1;
 
-namespace Shuttle.Core.Serialization.Tests
+namespace Shuttle.Core.Serialization.Tests;
+
+public class JsonSerializerFixture
 {
-    public class JsonSerializerFixture
+    [Test]
+    public async Task Should_be_able_to_serialize_and_deserialize_a_complex_type_async()
     {
-        [Test]
-        public async Task Should_be_able_to_serialize_and_deserialize_a_simple_type_async()
-        {
-            var original = new SimpleSerializerType();
-            var serializer = new JsonSerializer(Options.Create(new JsonSerializerOptions()));
+        var complex = new ComplexSerializerType();
+        var serializer = new JsonSerializer(Options.Create(new JsonSerializerOptions()));
 
-            var stream = await serializer.SerializeAsync(original);
+        var stream = await serializer.SerializeAsync(complex);
 
-            stream.Position = 0;
+        stream.Position = 0;
 
-            var json = await new StreamReader(stream).ReadToEndAsync();
+        var json = await new StreamReader(stream).ReadToEndAsync();
 
-            Assert.That(json.Contains(original.Id.ToString()), Is.True);
+        Assert.That(json.Contains(complex.Id.ToString()), Is.True);
 
-            stream.Position = 0;
+        stream.Position = 0;
 
-            Assert.That(((SimpleSerializerType)await serializer.DeserializeAsync(typeof(SimpleSerializerType), stream)).Id, Is.EqualTo(original.Id));
-        }
+        Assert.That(((ComplexSerializerType)await serializer.DeserializeAsync(typeof(ComplexSerializerType), stream)).Id, Is.EqualTo(complex.Id));
 
-        [Test]
-        public async Task Should_be_able_to_serialize_and_deserialize_a_complex_type_async()
-        {
-            var complex = new ComplexSerializerType();
-            var serializer = new JsonSerializer(Options.Create(new JsonSerializerOptions()));
+        Console.WriteLine(json);
 
-            var stream = await serializer.SerializeAsync(complex);
+        var some1 = new SomeSerializerType();
+        var some2 = new v2.SomeSerializerType();
 
-            stream.Position = 0;
+        var some1Serialized = await serializer.SerializeAsync(some1);
+        var some2Serialized = await serializer.SerializeAsync(some2);
 
-            var json = await new StreamReader(stream).ReadToEndAsync();
+        some1Serialized.Position = 0;
+        some2Serialized.Position = 0;
 
-            Assert.That(json.Contains(complex.Id.ToString()), Is.True);
+        Assert.That(((SomeSerializerType)await serializer.DeserializeAsync(typeof(SomeSerializerType), some1Serialized)).Id, Is.EqualTo(some1.Id));
+        Assert.That(((v2.SomeSerializerType)await serializer.DeserializeAsync(typeof(v2.SomeSerializerType), some2Serialized)).Id, Is.EqualTo(some2.Id));
+    }
 
-            stream.Position = 0;
+    [Test]
+    public async Task Should_be_able_to_serialize_and_deserialize_a_simple_type_async()
+    {
+        var original = new SimpleSerializerType();
+        var serializer = new JsonSerializer(Options.Create(new JsonSerializerOptions()));
 
-            Assert.That(((ComplexSerializerType)await serializer.DeserializeAsync(typeof(ComplexSerializerType), stream)).Id, Is.EqualTo(complex.Id));
+        var stream = await serializer.SerializeAsync(original);
 
-            Console.WriteLine(json);
+        stream.Position = 0;
 
-            var some1 = new v1.SomeSerializerType();
-            var some2 = new v2.SomeSerializerType();
+        var json = await new StreamReader(stream).ReadToEndAsync();
 
-            var some1Serialized = await serializer.SerializeAsync(some1);
-            var some2Serialized = await serializer.SerializeAsync(some2);
+        Assert.That(json.Contains(original.Id.ToString()), Is.True);
 
-            some1Serialized.Position = 0;
-            some2Serialized.Position = 0;
+        stream.Position = 0;
 
-            Assert.That(((v1.SomeSerializerType)await serializer.DeserializeAsync(typeof(v1.SomeSerializerType), some1Serialized)).Id, Is.EqualTo(some1.Id));
-            Assert.That(((v2.SomeSerializerType)await serializer.DeserializeAsync(typeof(v2.SomeSerializerType), some2Serialized)).Id, Is.EqualTo(some2.Id));
-        }
+        Assert.That(((SimpleSerializerType)await serializer.DeserializeAsync(typeof(SimpleSerializerType), stream)).Id, Is.EqualTo(original.Id));
     }
 }
