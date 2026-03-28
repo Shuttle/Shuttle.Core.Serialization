@@ -8,7 +8,7 @@ The `Shuttle.Core.Serialization` package provides a consistent interface for ser
 dotnet add package Shuttle.Core.Serialization
 ```
 
-## Interface
+## `ISerializer` interface
 
 The core of the library is the `ISerializer` interface:
 
@@ -16,31 +16,32 @@ The core of the library is the `ISerializer` interface:
 public interface ISerializer
 {
     string Name { get; }
-    Task<Stream> SerializeAsync(object instance, CancellationToken cancellationToken = default);
     Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default);
+    Task<Stream> SerializeAsync(object instance, CancellationToken cancellationToken = default);
 }
 ```
 
 The following implementation is provided:
 
 - `JsonSerializer`: uses `System.Text.Json` for serialization.
+- `SerializerService`: used to manage multiple `ISerializer` instances.
 
 ## Usage
 
-### AddJsonSerializer
+### `AddJsonSerializer`
 
 To register the `JsonSerializer`, use the `AddJsonSerializer` extension method on `IServiceCollection`:
 
 ```csharp
-services.AddJsonSerializer(builder => 
+services.AddJsonSerializer(options => 
 {
-    builder.Options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 ```
 
-The `builder.Options` is of type [JsonSerializerOptions](https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions?view=net-6.0).
+The `options` is of type [JsonSerializerOptions](https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions?view=net-6.0).
 
-### ISerializerService
+### `ISerializerService`
 
 The `ISerializerService` can be used to manage multiple serializers:
 
@@ -69,7 +70,7 @@ if (serializerService.Contains("Json"))
 
 ## Methods
 
-### SerializeAsync
+### `SerializeAsync`
 
 ```csharp
 Task<Stream> SerializeAsync(object instance, CancellationToken cancellationToken = default);
@@ -77,7 +78,7 @@ Task<Stream> SerializeAsync(object instance, CancellationToken cancellationToken
 
 Returns the `object` as a `Stream`.
 
-### DeserializeAsync
+### `DeserializeAsync`
 
 ```csharp
 Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default);
@@ -85,7 +86,7 @@ Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancel
 
 Deserializes the `Stream` into an `object` of the given `Type`.
 
-### DeserializeAsync&lt;T&gt; (Extension method)
+### `DeserializeAsync<T>` (Extension method)
 
 ```csharp
 Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default);

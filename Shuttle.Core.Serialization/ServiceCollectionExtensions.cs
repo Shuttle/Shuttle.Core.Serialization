@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
-using Shuttle.Core.Contract;
 
 namespace Shuttle.Core.Serialization;
 
@@ -8,51 +7,22 @@ public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddJsonSerializer(Action<JsonSerializerBuilder>? builder = null)
+        public IServiceCollection AddJsonSerializer()
         {
-            Guard.AgainstNull(services);
-
-            var jsonSerializerBuilder = new JsonSerializerBuilder(services);
-
-            builder?.Invoke(jsonSerializerBuilder);
+            ArgumentNullException.ThrowIfNull(services);
 
             services.AddSingleton<ISerializer, JsonSerializer>();
 
-            services.Configure<JsonSerializerOptions>(options =>
-            {
-                options.AllowDuplicateProperties = jsonSerializerBuilder.Options.AllowDuplicateProperties;
-                options.AllowOutOfOrderMetadataProperties = jsonSerializerBuilder.Options.AllowOutOfOrderMetadataProperties;
-                options.AllowTrailingCommas = jsonSerializerBuilder.Options.AllowTrailingCommas;
-                options.PropertyNamingPolicy = jsonSerializerBuilder.Options.PropertyNamingPolicy;
-                options.PropertyNameCaseInsensitive = jsonSerializerBuilder.Options.PropertyNameCaseInsensitive;
-                options.DictionaryKeyPolicy = jsonSerializerBuilder.Options.DictionaryKeyPolicy;
-                options.DefaultIgnoreCondition = jsonSerializerBuilder.Options.DefaultIgnoreCondition;
-                options.IgnoreReadOnlyProperties = jsonSerializerBuilder.Options.IgnoreReadOnlyProperties;
-                options.IgnoreReadOnlyFields = jsonSerializerBuilder.Options.IgnoreReadOnlyFields;
-                options.IncludeFields = jsonSerializerBuilder.Options.IncludeFields;
-                options.NumberHandling = jsonSerializerBuilder.Options.NumberHandling;
-                options.UnknownTypeHandling = jsonSerializerBuilder.Options.UnknownTypeHandling;
-                options.UnmappedMemberHandling = jsonSerializerBuilder.Options.UnmappedMemberHandling;
-                options.PreferredObjectCreationHandling = jsonSerializerBuilder.Options.PreferredObjectCreationHandling;
-                options.RespectNullableAnnotations = jsonSerializerBuilder.Options.RespectNullableAnnotations;
-                options.RespectRequiredConstructorParameters = jsonSerializerBuilder.Options.RespectRequiredConstructorParameters;
-                options.ReadCommentHandling = jsonSerializerBuilder.Options.ReadCommentHandling;
-                options.MaxDepth = jsonSerializerBuilder.Options.MaxDepth;
-                options.WriteIndented = jsonSerializerBuilder.Options.WriteIndented;
-                options.IndentCharacter = jsonSerializerBuilder.Options.IndentCharacter;
-                options.IndentSize = jsonSerializerBuilder.Options.IndentSize;
-                options.NewLine = jsonSerializerBuilder.Options.NewLine;
-                options.Encoder = jsonSerializerBuilder.Options.Encoder;
-                options.DefaultBufferSize = jsonSerializerBuilder.Options.DefaultBufferSize;
-                options.ReferenceHandler = jsonSerializerBuilder.Options.ReferenceHandler;
+            return services;
+        }
 
-                foreach (var converter in jsonSerializerBuilder.Options.Converters)
-                {
-                    options.Converters.Add(converter);
-                }
+        public IServiceCollection AddJsonSerializer(Action<JsonSerializerOptions> configureOptions)
+        {
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(configureOptions);
 
-                options.TypeInfoResolver = jsonSerializerBuilder.Options.TypeInfoResolver;
-            });
+            services.AddJsonSerializer();
+            services.Configure(configureOptions);
 
             return services;
         }
