@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Shuttle.Core.Serialization\Shuttle.Core.Serialization.csproj" />
+    <ProjectReference Include="..\Shuttle.Serialization\Shuttle.Serialization.csproj" />
   </ItemGroup>
 
 </Project>

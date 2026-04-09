@@ -1,4 +1,4 @@
-﻿namespace Shuttle.Core.Serialization.Tests.v2;
+﻿namespace Shuttle.Serialization.Tests.v1;
 
 public class AnotherSerializerType
 {

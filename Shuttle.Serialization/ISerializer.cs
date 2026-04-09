@@ -1,4 +1,4 @@
-﻿namespace Shuttle.Core.Serialization;
+﻿namespace Shuttle.Serialization;
 
 public interface ISerializer
 {

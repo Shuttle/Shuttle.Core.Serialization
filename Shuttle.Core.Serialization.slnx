@@ -1,8 +1,0 @@
-<Solution>
-  <Folder Name="/Solution Items/">
-    <File Path="LICENSE" />
-    <File Path="README.md" />
-  </Folder>
-  <Project Path="Shuttle.Core.Serialization.Tests/Shuttle.Core.Serialization.Tests.csproj" />
-  <Project Path="Shuttle.Core.Serialization/Shuttle.Core.Serialization.csproj" />
-</Solution>

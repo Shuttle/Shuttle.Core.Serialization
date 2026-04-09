@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Shuttle.Core.Contract" Version="21.0.1-rc3" />
+    <PackageReference Include="Shuttle.Contract" Version="21.0.1-rc3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.3" />
   </ItemGroup>
@@ -36,8 +36,8 @@
   <PropertyGroup>
     <Description>Serialization adapter.</Description>
     <Version>21.0.1-rc3</Version>
-    <PackageProjectUrl>https://github.com/shuttle/Shuttle.Core.Serialization</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/shuttle/Shuttle.Core.Serialization.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/shuttle/Shuttle.Serialization</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/shuttle/Shuttle.Serialization.git</RepositoryUrl>
     <PackageTags>shuttle serialization</PackageTags>
     <Authors>Eben Roux</Authors>
     <Company>Shuttle</Company>

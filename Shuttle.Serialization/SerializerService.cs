@@ -1,6 +1,6 @@
-﻿using Shuttle.Core.Contract;
+﻿using Shuttle.Contract;
 
-namespace Shuttle.Core.Serialization;
+namespace Shuttle.Serialization;
 
 public class SerializerService : ISerializerService
 {

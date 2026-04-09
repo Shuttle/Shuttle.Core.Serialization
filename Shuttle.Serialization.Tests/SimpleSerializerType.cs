@@ -1,4 +1,4 @@
-﻿namespace Shuttle.Core.Serialization.Tests;
+﻿namespace Shuttle.Serialization.Tests;
 
 public class SimpleSerializerType
 {

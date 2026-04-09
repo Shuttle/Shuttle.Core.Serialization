@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Shuttle.Core.Serialization;
+namespace Shuttle.Serialization;
 
 public static class ServiceCollectionExtensions
 {

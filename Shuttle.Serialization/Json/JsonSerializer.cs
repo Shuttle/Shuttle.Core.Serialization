@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
-using Shuttle.Core.Contract;
+using Shuttle.Contract;
 
-namespace Shuttle.Core.Serialization;
+namespace Shuttle.Serialization;
 
 public class JsonSerializer(IOptions<JsonSerializerOptions> jsonSerializeOptions) : ISerializer
 {
