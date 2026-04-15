@@ -1,7 +1,6 @@
-﻿using System;
-using Shuttle.Core.Serialization.Tests.v1;
+﻿using Shuttle.Serialization.Tests.v1;
 
-namespace Shuttle.Core.Serialization.Tests;
+namespace Shuttle.Serialization.Tests;
 
 public class ComplexSerializerType
 {

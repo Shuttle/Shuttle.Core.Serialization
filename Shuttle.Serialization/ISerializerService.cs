@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Shuttle.Core.Serialization;
+﻿namespace Shuttle.Serialization;
 
 public interface ISerializerService
 {

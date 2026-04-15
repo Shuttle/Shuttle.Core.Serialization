@@ -1,107 +1,96 @@
 # Shuttle.Core.Serialization
 
-```
-PM> Install-Package Shuttle.Core.Serialization
+The `Shuttle.Core.Serialization` package provides a consistent interface for serializing and deserializing objects.
+
+## Installation
+
+```bash
+dotnet add package Shuttle.Core.Serialization
 ```
 
-The following implementations of the `ISerializer` interface is used to serialize objects into a `Stream`:
+## `ISerializer` interface
 
-- `XmlSerializer` makes use of the standard .NET XML serialization functionality.
-- `JsonSerializer` makes use of the `System.Test.Json` serialization functionality.
+The core of the library is the `ISerializer` interface:
+
+```csharp
+public interface ISerializer
+{
+    string Name { get; }
+    Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default);
+    Task<Stream> SerializeAsync(object instance, CancellationToken cancellationToken = default);
+}
+```
+
+The following implementation is provided:
+
+- `JsonSerializer`: uses `System.Text.Json` for serialization.
+- `SerializerService`: used to manage multiple `ISerializer` instances.
 
 ## Usage
 
-### XmlSerializer
+### `AddJsonSerializer`
 
-``` c#
-services.AddXmlSerializer(builder => {
-	builder.Options = new XmlSerializerOptions 
-	{
-	};
+To register the `JsonSerializer`, use the `AddJsonSerializer` extension method on `IServiceCollection`:
 
-	// or
-
-	buidler.Options.option = value;
+```csharp
+services.AddJsonSerializer(options => 
+{
+    options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 ```
 
-The `builder.Options` contains properties that map to [XmlWriterSettings](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlwritersettings?view=net-8.0) as well as [XmlDictionaryReaderQuotas](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmldictionaryreaderquotas?view=net-8.0).
+The `options` is of type [JsonSerializerOptions](https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions?view=net-6.0).
 
-### JsonSerializer
+### `ISerializerService`
 
-``` c#
-services.AddJsonSerializer(builder => {
-	builder.Options = new JsonSerializerOptions 
-	{
-	};
+The `ISerializerService` can be used to manage multiple serializers:
 
-	// or
-
-	buidler.Options.option = value;
-});
+```csharp
+public interface ISerializerService
+{
+    IEnumerable<ISerializer> Serializers { get; }
+    ISerializerService Add(ISerializer serializer);
+    bool Contains(string name);
+    ISerializer Get(string name);
+}
 ```
 
-The `builder.Options` is of type [JsonSerializerOptions](https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions?view=net-6.0).
+You can use the `SerializerService` implementation to store and retrieve serializers by their `Name`:
+
+```csharp
+var serializerService = new SerializerService();
+
+serializerService.Add(new JsonSerializer(Options.Create(new JsonSerializerOptions())));
+
+if (serializerService.Contains("Json"))
+{
+    var serializer = serializerService.Get("Json");
+}
+```
 
 ## Methods
 
-### Serialize
+### `SerializeAsync`
 
-``` c#
-Task<Stream> SerializeAsync(object message);
+```csharp
+Task<Stream> SerializeAsync(object instance, CancellationToken cancellationToken = default);
 ```
 
-Returns the message `object` as a `Stream`.
+Returns the `object` as a `Stream`.
 
-### Deserialize
+### `DeserializeAsync`
 
-``` c#
-Task<object> DeserializeAsync(Type type, Stream stream);
+```csharp
+Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default);
 ```
 
-Deserializes the `Stream` into an `object` of the given type.
+Deserializes the `Stream` into an `object` of the given `Type`.
 
-## ISerializerRootType
+### `DeserializeAsync<T>` (Extension method)
 
-The `XmlSerializer` implements the `ISerializerRootType` interface which is an optional interface that serializer implementations can use that allows the developer to specify explicit object types contained within a root type.  
-
-It is recommended that you explicitly register types with the same name, but in different namespaes, that will be serialized within the same root type to avoid any conflicts later down the line.
-
-For instance, the following two types will cause issues when used in the root `Complex` type as they both serialize to the same name and the .Net serializer cannot seem to distinguish the difference:
-
-``` c#
-namespace Serializer.v1
-{
-	public class MovedEvent
-	{
-		public string Where { get; set; } 
-	}
-}
-
-namespace Serializer.v2
-{
-	public class MovedEvent
-	{
-		public string Where { get; set; } 
-	}
-}
-
-namespace Serializer
-{
-	public class Complex
-	{
-		public v1.MovedEvent { get; set; }
-		public v2.MovedEvent { get; set; }
-	}
-}
+```csharp
+Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default);
 ```
 
-By explicitly specifying the types the `XmlSerializer` will add a namespace that will cause the types to be correctly identified.
+Deserializes the `Stream` into an `object` of the given type `T`.
 
-### AddSerializerType
-
-``` c#
-void AddSerializerType(Type root, Type contained);
-```
-
-Specify the `contained` type that is used within the `root` type.
